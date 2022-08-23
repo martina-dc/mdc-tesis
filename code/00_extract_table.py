@@ -82,7 +82,7 @@ from utils.utils import get_q_items, create_item_list, get_available_filters, ge
 
 
 filters = {"installments":"yes",
-           "power_seller":"yes",
+           "display_size":'(*-14.1")',
           "shipping_cost":"free"}
 
 
@@ -104,9 +104,7 @@ item_list = create_item_list(filters = filters)
 
 data = get_df_list(item_list)
 data["installment"] = "yes"
-data["power_seller"] = "yes" 
-
-
+data["display_size"] = "hasta 14.1" 
 data["shipping_cost"] = "free"
 
 
@@ -116,8 +114,8 @@ data["shipping_cost"] = "free"
 
 
 filters = {"installments":"yes",
-           "power_seller":"no",
-          "shipping_cost":"free"}
+           "display_size":'[14.1"-17")',
+                "shipping_cost":"free"}
 
 
 # In[10]:
@@ -138,7 +136,7 @@ item_list = create_item_list(filters = filters)
 
 data2 = get_df_list(item_list)
 data2["installment"] = "yes"
-data2["power_seller"] = "no"
+data2["display_size"] = "entre 14.1 y 16.9"
 data2["shipping_cost"] = "free"
 
 
@@ -148,7 +146,7 @@ data2["shipping_cost"] = "free"
 
 
 filters = {"installments":"no_interest",
-           "power_seller":"yes",
+           "display_size":'(*-14.1")',
           "shipping_cost":"free"}
 
 
@@ -170,7 +168,7 @@ item_list = create_item_list(filters = filters)
 
 data3 = get_df_list(item_list)
 data3["installment"] = "no_interest"
-data3["power_seller"] = "yes"
+data3["display_size"] = "hasta 14.1" 
 data3["shipping_cost"] = "free"
 
 
@@ -180,7 +178,7 @@ data3["shipping_cost"] = "free"
 
 
 filters = {"installments":"no_interest",
-           "power_seller":"no",
+           "display_size":'[14.1"-17")',
           "shipping_cost":"free"}
 
 
@@ -202,7 +200,7 @@ item_list = create_item_list(filters = filters)
 
 data4 = get_df_list(item_list)
 data4["installment"] = "no_interest"
-data4["power_seller"] = "no"
+data4["display_size"] = "entre 14.1 y 16.9"
 data4["shipping_cost"] = "free"
 
 

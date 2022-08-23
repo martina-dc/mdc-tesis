@@ -96,15 +96,15 @@ def get_q_items(filters: dict = {}) -> int:
     
     """
     if len(filters) == 0:
-        url='https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan#json'
+        url='https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan&ITEM_CONDITION=2230284#json'
     elif len(filters) == 1:
         iter_f = iter(filters)
-        url=f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan&{next(iter_f)}={filters[next(iter_f)]}#json'
+        url=f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan&ITEM_CONDITION=2230284&{next(iter_f)}={filters[next(iter_f)]}#json'
     elif len(filters) == 2:
         iter_f = iter(filters)
         id1 = next(iter_f)
         id2 = next(iter_f)
-        url=   'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan' + \
+        url=   'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan&ITEM_CONDITION=2230284' + \
                 f'&{id1}={filters[next(id1)]}'+ \
                 f'&{id2}={filters[next(id2)]}'+ \
                 '&order_by=start_time_desc&#json'
@@ -113,7 +113,7 @@ def get_q_items(filters: dict = {}) -> int:
         id1 = next(iter_f)
         id2 = next(iter_f)
         id3 = next(iter_f)
-        url=   'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan' + \
+        url=   'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan&ITEM_CONDITION=2230284' + \
                 f'&{id1}={filters[id1]}'+ \
                 f'&{id2}={filters[id2]}'+ \
                 f'&{id3}={filters[id3]}'+ \
@@ -144,17 +144,17 @@ def create_item_list(filters: dict = {}):
         
         
         if len(filters) == 0:
-               url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&order_by=start_time_desc&#json'
+               url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&ITEM_CONDITION=2230284&order_by=start_time_desc&#json'
         elif len(filters) == 1:
             iter_f = iter(filters)
-            url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&order_by=start_time_desc&{next(iter_f)}={filters[next(iter_f)]}#json'
+            url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&ITEM_CONDITION=2230284&order_by=start_time_desc&{next(iter_f)}={filters[next(iter_f)]}#json'
 
         elif len(filters) == 2:
             iter_f = iter(filters)
             id1 = next(iter_f)
             id2 = next(iter_f)
 
-            url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&order_by=start_time_desc&' + \
+            url = f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&ITEM_CONDITION=2230284&order_by=start_time_desc&' + \
                     f'&{id1}={filters[id2]}'+ \
                     f'&{id2}={filters[id2]}'+ \
                     '#json'
@@ -163,7 +163,7 @@ def create_item_list(filters: dict = {}):
             id1 = next(iter_f)
             id2 = next(iter_f)
             id3 = next(iter_f)
-            url= f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&order_by=start_time_desc&' + \
+            url= f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}&ITEM_CONDITION=2230284&order_by=start_time_desc&' + \
                     f'&{id1}={filters[id1]}'+ \
                     f'&{id2}={filters[id2]}'+ \
                     f'&{id3}={filters[id3]}'+ \

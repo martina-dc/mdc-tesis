@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ## Exploratory Data Analysis
+# ## Data Preparation
 
 # In[1]:
 
@@ -81,17 +81,17 @@ df.shape
 
 # # Seleccionamos las columnas de interes
 
-# In[11]:
+# In[12]:
 
 
 selected_cols = ["id", "title","seller_id","price","base_price","deal_ids","initial_quantity","sold_quantity", "listing_type_id",
-                 "available_quantity","sold_quantity","sale_terms","condition",
+                 "available_quantity","sold_quantity","sale_terms","condition", "installment", "display_size", "shipping_cost",
                  "descriptions","attributes","warnings","status","date_created","shipping.mode","shipping.free_shipping"]
 
 df = df[selected_cols]
 
 
-# In[12]:
+# In[13]:
 
 
 df.status.value_counts()
@@ -99,34 +99,46 @@ df.status.value_counts()
 
 # #### Filtramos aquellas que no esten activas
 
-# In[13]:
+# In[14]:
 
 
 c_active = df.status.isin(["active"])
 df = df[c_active]
 
 
-# In[14]:
+# In[15]:
 
 
 df["shipping.mode"].value_counts()
 
 
-# In[15]:
+# In[16]:
 
 
 df["shipping.free_shipping"].value_counts()
 
 
-# In[16]:
+# In[17]:
 
 
 df["listing_type_id"].value_counts()
 
 
+# #### Borramos del df original aquellas que tengan mas del 50% nulos
+
+# In[18]:
+
+
+perc = 50.0 # Like N %
+min_count =  int(((100-perc)/100)*df.shape[0] + 1)
+df = df.dropna( axis=1, 
+                thresh=min_count)
+df.info(verbose = True, show_counts  = True)
+
+
 # ## Desarmamos las columnas attributes y sale_terms que son un dicc
 
-# In[17]:
+# In[19]:
 
 
 df_attributes = df[["id","attributes"]].copy()
@@ -162,11 +174,19 @@ df_attributes = pd.concat(lista_filas)
 display(df_attributes.head())
 
 
+# #### Borramos aquellas columnas del df de atributtes que tengan mas del 50% de nulos
+
 # In[22]:
 
 
+perc = 50.0 # Like N %
+min_count =  int(((100-perc)/100)*df_attributes.shape[0] + 1)
+df_attributes = df_attributes.dropna( axis=1, 
+                thresh=min_count)
 df_attributes.info(verbose = True, null_counts = True)
 
+
+# #### Garantia del producto
 
 # In[23]:
 
@@ -181,19 +201,69 @@ df_st.head()
 # In[24]:
 
 
-df_st.info()
+del df_st["Cantidad máxima de compra"], df_st["Disponibilidad de stock"], df_st["Facturación"]
 
 
-# ___________
+# In[25]:
 
-# In[30]:
+
+df_st.head()
+
+
+# ### Juntamos todos los dataframes
+
+# In[26]:
+
+
+display(df.columns)
+display(df.shape)
+display(df.id.nunique())
+
+
+# In[33]:
+
+
+df_attributes.drop_duplicates(inplace = True)
+display(df_attributes.columns)
+display(df_attributes.shape)
+display(df_attributes.id.nunique())
+
+
+# In[34]:
+
+
+df_st.drop_duplicates(inplace = True)
+display(df_st.columns)
+display(df_st.shape)
+display(df_st.id.nunique())
+
+
+# #### Merge
+
+# In[37]:
+
+
+display(df.shape)
+df = df.merge(df_attributes, on = "id", how = "left")
+display(df.shape)
+
+
+# In[38]:
+
+
+display(df.shape)
+df = df.merge(df_st, on = "id", how = "left")
+display(df_.shape)
+
+
+# In[39]:
 
 
 df.head()
 
 
-# In[ ]:
+# In[42]:
 
 
-
+df.to_csv(path / "datos_laptops_transformed.csv", index = False, sep = ";")
 
