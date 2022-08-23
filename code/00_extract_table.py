@@ -5,7 +5,7 @@
 
 # ## Importación de librerias
 
-# In[43]:
+# In[1]:
 
 
 import pandas as pd
@@ -34,172 +34,200 @@ except ModuleNotFoundError:
     get_ipython().system('pip install seaborn')
 
 
-# In[44]:
+# In[2]:
 
 
-from google.colab import drive
-drive.mount('/content/drive')
+here()
 
 
-# In[45]:
+# In[3]:
 
 
-path_secrets = "/content/drive/MyDrive/Austral/Maestria/Tesis/Codigo/secrets/"
+path_save = here() / "data" 
 
 
-# ## Definicion de funciones a utilizar para obtener los datos
-
-# In[46]:
+# In[4]:
 
 
-def auth_token():
-    with open(path_secrets + 'secrets.json') as f:
-        secrets = json.load(f)
-    
-    print(f'http://auth.mercadolibre.com.ar/authorization?response_type=code&client_id={secrets["client_id"]}&redirect_uri={secrets["redirect_uri"]}')
-    codigo = input('Codigo :')
-    url = 'https://api.mercadolibre.com/oauth/token'
-    response = requests.post(url, data = {
-        
-        'grant_type' : 'authorization_code',
-        'client_id': secrets['client_id'],
-        'client_secret': secrets['client_secret'],
-         'code' : codigo,
-        'redirect_uri': secrets['redirect_uri']
-    })
-    print(response)
-    return response.json()['access_token']
-
-meli_auth_token = None
-
-def get_response(url):
-    global meli_auth_token
-    
-    try:
-        if meli_auth_token is None and 'mercadolibre' in url:
-            meli_auth_token = auth_token()
-        response = requests.get(url, timeout = 4,
-                                   headers={'Authorization': f'Bearer {meli_auth_token}'})
-        response.raise_for_status()
-        return response
-    except requests.exceptions.HTTPError as errh:
-        print ("Http Error:",errh)
-    except requests.exceptions.ConnectionError as errc:
-        print ("Error Connecting:",errc)
-    except requests.exceptions.Timeout as errt:
-        print ("Timeout Error:",errt)
-    except requests.exceptions.RequestException as err:
-        print ("OOps: Something Else",err)
-        
-#Definimos una función para traer el elemento que queremos
-def traerdato(elemento,rama,subrama,valor='value_name'):
-    indices=[]
-    for i,s in enumerate(elemento[rama]):
-        for j in s:
-            if subrama in str(s[j]):
-                indices.append([i,s])
-    if len(indices) == 0:
-        return 'Sin Datos'
-    else:
-        return indices[0][1][valor]
-
-
-# In[47]:
-
-
-meli_auth_token = auth_token()
+import sys
+sys.path.append(here())
+from utils.utils import get_q_items, create_item_list, get_available_filters, get_df_list
 
 
 # ## Armado del Dataset
 
-# Para armar el dataset descargaremos para Mercado Libre Argentina laptops publicadas. La categoría se llama: MLA1652
+# Para armar el dataset descargaremos para Mercado Libre Argentina laptops publicadas. La categoría se llama: MLA1652.
+# La API tiene una restricción que no permite utilizar un offset mayor a 4000. Esto nos permite descargar menos de 4000 publicaciones por loop.
+# Es por ello que se han armado ciertos grupos para descargar la información por grupo. Esto nos permite tambien etiquetar a las publicaciones con este atributo, 
+# elemento que no se obtiene descargando la información de la publicación.
 
-# In[48]:
+# <img src="Grupos.png" alt="Drawing" style="width: 501px;"/>
+# 
+
+# Para armar estos grupos necesitamos filtar desde el url mediante los siguientes nombres:  
+# 
+# * installments:  
+#     + yes  
+#     + no_interest  
+# * power_seller:  
+#     + yes  
+#     + no  
+# * shipping_cost:  
+#     + get_available_filtersfree  
+#             
+
+# ### Grupo 1
+
+# In[5]:
 
 
-url='https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&search_type=scan#json'
+filters = {"installments":"yes",
+           "power_seller":"yes",
+          "shipping_cost":"free"}
 
-r = get_response(url) 
-maximum = int(str(r.json()["paging"]["total"])) #Guardamos el número máximo de resultados para luego stoppear nuestro loop
 
+# In[6]:
+
+
+maximum = get_q_items(filters = filters)
 print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 
-# In[49]:
+# In[7]:
 
 
-offset_max = maximum / 50
-offset_max
+item_list = create_item_list(filters = filters)
 
 
-# In[50]:
+# In[8]:
 
 
-offset = 0
-item_list = []
-
-while r.status_code == 200 and offset <= round(offset_max):
-    url=f'https://api.mercadolibre.com/sites/MLA/search?category=MLA1652&offset={offset}#json'
-    r = get_response(url)
-    if r is not None:
-      data = r.json()
-      length = len(data['results'])
-      for i in range(length):
-          item_id = data['results'][i]['id']
-          item_list.append(item_id)
-      print("Porcentaje de completitud: {:0.2%}".format(offset/maximum),end='\r')
-
-    offset += 1
-          
-len(item_list)
+data = get_df_list(item_list)
+data["installment"] = "yes"
+data["power_seller"] = "yes" 
 
 
-# In[52]:
+data["shipping_cost"] = "free"
 
 
-final_list = []
-for i in range(len(item_list)):
-    item="https://api.mercadolibre.com/items/{}".format(item_list[i])
-    item_add = requests.get(item)
-    item_add = item_add.json()
-    final_list.append(item_add)
-    print("Porcentaje de completitud: {:0.2%}".format((i+1)/len(item_list)),end='\r')
+# ### Grupo 2
+
+# In[9]:
 
 
-# In[ ]:
+filters = {"installments":"yes",
+           "power_seller":"no",
+          "shipping_cost":"free"}
 
 
-print(len(item_list))
-print(len(set(item_list)))
+# In[10]:
 
 
-# In[56]:
+maximum = get_q_items(filters = filters)
+print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 
-data = pd.json_normalize(final_list)
-data.head(3)
+# In[11]:
 
 
-# In[57]:
+item_list = create_item_list(filters = filters)
+
+
+# In[12]:
+
+
+data2 = get_df_list(item_list)
+data2["installment"] = "yes"
+data2["power_seller"] = "no"
+data2["shipping_cost"] = "free"
+
+
+# ### Grupo 3
+
+# In[13]:
+
+
+filters = {"installments":"no_interest",
+           "power_seller":"yes",
+          "shipping_cost":"free"}
+
+
+# In[14]:
+
+
+maximum = get_q_items(filters = filters)
+print(f'Encontramos {maximum} resultados para nuestra consulta')
+
+
+# In[15]:
+
+
+item_list = create_item_list(filters = filters)
+
+
+# In[16]:
+
+
+data3 = get_df_list(item_list)
+data3["installment"] = "no_interest"
+data3["power_seller"] = "yes"
+data3["shipping_cost"] = "free"
+
+
+# ### Grupo 4
+
+# In[17]:
+
+
+filters = {"installments":"no_interest",
+           "power_seller":"no",
+          "shipping_cost":"free"}
+
+
+# In[18]:
+
+
+maximum = get_q_items(filters = filters)
+print(f'Encontramos {maximum} resultados para nuestra consulta')
+
+
+# In[19]:
+
+
+item_list = create_item_list(filters = filters)
+
+
+# In[20]:
+
+
+data4 = get_df_list(item_list)
+data4["installment"] = "no_interest"
+data4["power_seller"] = "no"
+data4["shipping_cost"] = "free"
+
+
+# ________________________
+
+# In[21]:
+
+
+data = pd.concat([data, data2, data3, data4])
+
+
+# In[22]:
+
+
+data.shape
+
+
+# In[23]:
 
 
 data.title.value_counts()
 
 
-# In[60]:
+# In[24]:
 
 
-path_save = "/content/drive/MyDrive/Austral/Maestria/Tesis/Data/"
-
-
-# In[61]:
-
-
-data.to_csv(path_save + "datos_laptops.csv", index = False, sep = ";")
-
-
-# In[ ]:
-
-
-
+data.to_csv(path_save / "datos_laptops.csv", index = False, sep = ";")
 
