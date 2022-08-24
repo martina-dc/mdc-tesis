@@ -81,7 +81,7 @@ df.shape
 
 # # Seleccionamos las columnas de interes
 
-# In[12]:
+# In[11]:
 
 
 selected_cols = ["id", "title","seller_id","price","base_price","deal_ids","initial_quantity","sold_quantity", "listing_type_id",
@@ -91,7 +91,7 @@ selected_cols = ["id", "title","seller_id","price","base_price","deal_ids","init
 df = df[selected_cols]
 
 
-# In[13]:
+# In[12]:
 
 
 df.status.value_counts()
@@ -99,26 +99,26 @@ df.status.value_counts()
 
 # #### Filtramos aquellas que no esten activas
 
-# In[14]:
+# In[13]:
 
 
 c_active = df.status.isin(["active"])
 df = df[c_active]
 
 
-# In[15]:
+# In[14]:
 
 
 df["shipping.mode"].value_counts()
 
 
-# In[16]:
+# In[15]:
 
 
 df["shipping.free_shipping"].value_counts()
 
 
-# In[17]:
+# In[16]:
 
 
 df["listing_type_id"].value_counts()
@@ -126,7 +126,7 @@ df["listing_type_id"].value_counts()
 
 # #### Borramos del df original aquellas que tengan mas del 50% nulos
 
-# In[18]:
+# In[17]:
 
 
 perc = 50.0 # Like N %
@@ -138,7 +138,7 @@ df.info(verbose = True, show_counts  = True)
 
 # ## Desarmamos las columnas attributes y sale_terms que son un dicc
 
-# In[19]:
+# In[18]:
 
 
 df_attributes = df[["id","attributes"]].copy()
@@ -148,7 +148,7 @@ df_sale_terms = df[["id","sale_terms"]].copy()
 dummy_st = df_sale_terms["sale_terms"].apply(lambda x: ast.literal_eval(x))
 
 
-# In[20]:
+# In[19]:
 
 
 lista_filas = []
@@ -164,7 +164,7 @@ for (index_dummy, row), (index_df, rowa) in zip(pd.DataFrame(dummy_st).iterrows(
     lista_id_st.append(rowa['id'])
 
 
-# In[21]:
+# In[20]:
 
 
 for df1, df2 in zip(lista_filas, lista_id):
@@ -176,7 +176,13 @@ display(df_attributes.head())
 
 # #### Borramos aquellas columnas del df de atributtes que tengan mas del 50% de nulos
 
-# In[22]:
+# In[23]:
+
+
+df_temp = df_attributes[["id", "Modelo del procesador"]].copy()
+
+
+# In[24]:
 
 
 perc = 50.0 # Like N %
@@ -186,9 +192,21 @@ df_attributes = df_attributes.dropna( axis=1,
 df_attributes.info(verbose = True, null_counts = True)
 
 
+# In[25]:
+
+
+df_attributes = df_attributes.merge(df_temp, on = "id", how = "left")
+
+
+# In[26]:
+
+
+df_attributes.head()
+
+
 # #### Garantia del producto
 
-# In[23]:
+# In[27]:
 
 
 for df3, df4 in zip(lista_filas_st, lista_id_st):
@@ -198,13 +216,13 @@ df_st = pd.concat(lista_filas_st)
 df_st.head()
 
 
-# In[24]:
+# In[28]:
 
 
 del df_st["Cantidad máxima de compra"], df_st["Disponibilidad de stock"], df_st["Facturación"]
 
 
-# In[25]:
+# In[29]:
 
 
 df_st.head()
@@ -212,7 +230,7 @@ df_st.head()
 
 # ### Juntamos todos los dataframes
 
-# In[26]:
+# In[30]:
 
 
 display(df.columns)
@@ -220,7 +238,7 @@ display(df.shape)
 display(df.id.nunique())
 
 
-# In[33]:
+# In[31]:
 
 
 df_attributes.drop_duplicates(inplace = True)
@@ -229,7 +247,7 @@ display(df_attributes.shape)
 display(df_attributes.id.nunique())
 
 
-# In[34]:
+# In[32]:
 
 
 df_st.drop_duplicates(inplace = True)
@@ -240,7 +258,7 @@ display(df_st.id.nunique())
 
 # #### Merge
 
-# In[37]:
+# In[33]:
 
 
 display(df.shape)
@@ -248,21 +266,21 @@ df = df.merge(df_attributes, on = "id", how = "left")
 display(df.shape)
 
 
-# In[38]:
+# In[35]:
 
 
 display(df.shape)
 df = df.merge(df_st, on = "id", how = "left")
-display(df_.shape)
+display(df.shape)
 
 
-# In[39]:
+# In[36]:
 
 
 df.head()
 
 
-# In[42]:
+# In[37]:
 
 
 df.to_csv(path / "datos_laptops_transformed.csv", index = False, sep = ";")

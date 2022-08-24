@@ -61,7 +61,7 @@ from utils.utils import get_q_items, create_item_list, get_available_filters, ge
 # Es por ello que se han armado ciertos grupos para descargar la información por grupo. Esto nos permite tambien etiquetar a las publicaciones con este atributo, 
 # elemento que no se obtiene descargando la información de la publicación.
 
-# <img src="Grupos.png" alt="Drawing" style="width: 501px;"/>
+# <img src="Grupos.png" alt="Drawing" style="width: 600px;"/>
 # 
 
 # Para armar estos grupos necesitamos filtar desde el url mediante los siguientes nombres:  
