@@ -297,7 +297,12 @@ def normalizar_lineas_procesador(df: pd.DataFrame, col_original: str)-> pd.DataF
 
 
 
-def separar_valor_ram(df: pd.DataFrame, colname: str, res_val: str, res_um: str)->pd.DataFrame:
+def separar_valor_um(df: pd.DataFrame, 
+                    colname: str, 
+                    res_val: str, 
+                    res_um: str,
+                    cambio: dict,
+                    new_um: str)->pd.DataFrame:
     """
     Esta funcion recibe una columna que tiene un valor y una unidad de medida y lo devuelve en dos columnas
     separadas. El nombre de la columna a tomar es colname y lo devuelve en res_val el numero y en res_um la unidad de medida. 
@@ -314,6 +319,12 @@ def separar_valor_ram(df: pd.DataFrame, colname: str, res_val: str, res_um: str)
     res_um : str
        nuevo nombre que se le desea poner a la columna que tiene la unidad de medida.
 
+    cambio : dict
+       Diccionario que tiene las equivalencias entre unidades de medida.
+    
+    new_um : str
+       Nueva unidad de medida a la que llevaremos los valores.
+
     Returns
     -------
     pd.DataFrame
@@ -322,14 +333,17 @@ def separar_valor_ram(df: pd.DataFrame, colname: str, res_val: str, res_um: str)
 
     lista = df[colname].str.split(' ', 1, expand=True)
     df[res_val], df[res_um] = lista[0], lista[1]
-    cond_ram_mb = (df[res_um].str.lower() == "mb")
-    df.loc[cond_ram_mb, res_val] = df[res_val].fillna(-1).astype(float, errors = "ignore").astype(int) / 1000
-    df.loc[cond_ram_mb, res_um] = "GB"
 
-    cond_ram_kb = (df[res_um].str.lower() == "kb")
-    df.loc[cond_ram_kb, res_val] = df[res_val].fillna(-1).astype(float, errors = "ignore").astype(int) / 1000000
-    df.loc[cond_ram_kb, res_um] = "GB"
+    for key, value in cambio.items():
+        cond = (df[res_um].str.lower() == key)
+        df.loc[cond, res_val] = df[res_val].fillna(-1).astype(float, errors = "ignore").astype(int) / value
+        df.loc[cond, res_um] = new_um
+
+ 
 
     df[res_val] = df[res_val].fillna(-1).astype(float)
 
     return df
+
+
+  
