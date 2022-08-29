@@ -1,0 +1,12 @@
+c_precio = (df.price < 140000)  #& (df.price <= 300000) 
+c_peso = (df.valor_peso < 1.3)  # &(df.valor_peso >) n 
+c_tipo_tarjeta_grafica = df.tipo_tarjeta_grafica == "dedicada"
+c_es_gamer = df.es_gamer == "Sí"
+c_valor_screen0 = (df.valor_screen <= 14) 
+c_valor_screen = (df.valor_screen >= 15)  & (df.valor_screen <= 16) 
+c_ssd256 = df.capacidad_ssd >= 256
+c_procesador = df.linea_procesador == "Core i5"
+c_linea_procesador = df.linea_procesador.isin(["Pentium", "Otro", "Celeron"])
+c_ram = df.capacidad_ram >= 8
+
+df.loc[ c_tipo_tarjeta_grafica & c_valor_screen & c_precio & ~c_linea_procesador & c_ssd256 & c_ram & c_peso].sort_values(by = ["price", "capacidad_ram", "capacidad_ssd"], ascending = [False, False, False]).head(5)
