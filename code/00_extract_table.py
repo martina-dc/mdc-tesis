@@ -21,7 +21,7 @@ try:
     print("Libreria: 'pyprojroot' esta instalada y se cargo correctamente")
 except ModuleNotFoundError:
     print("Libreria: 'pyprojroot' no esta instalada, se debe instalar")
-    get_ipython().system('pip install pyprojroot')
+    !pip install pyprojroot
 
 import matplotlib.pyplot as plt
 import os
@@ -31,7 +31,7 @@ try:
     print("Libreria: 'seaborn' esta instalada y se cargo correctamente")
 except ModuleNotFoundError:
     print("Libreria: 'seaborn' no esta instalada, se debe instalar")
-    get_ipython().system('pip install seaborn')
+    !pip install seaborn
 
 
 # In[2]:
@@ -39,12 +39,11 @@ except ModuleNotFoundError:
 
 here()
 
-
 # In[3]:
 
 
 path_save = here() / "data" 
-
+path_secrets = here() / "secrets"   
 
 # In[4]:
 
@@ -52,7 +51,6 @@ path_save = here() / "data"
 import sys
 sys.path.append(here())
 from utils.utils import get_q_items, create_item_list, get_available_filters, get_df_list
-
 
 # ## Armado del Dataset
 
@@ -98,7 +96,6 @@ print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 item_list = create_item_list(filters = filters)
 
-
 # In[8]:
 
 
@@ -106,7 +103,6 @@ data = get_df_list(item_list)
 data["installment"] = "yes"
 data["display_size"] = "hasta 14.1" 
 data["shipping_cost"] = "free"
-
 
 # ### Grupo 2
 
@@ -130,15 +126,13 @@ print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 item_list = create_item_list(filters = filters)
 
-
-# In[12]:
+# In[22]:
 
 
 data2 = get_df_list(item_list)
 data2["installment"] = "yes"
 data2["display_size"] = "entre 14.1 y 16.9"
 data2["shipping_cost"] = "free"
-
 
 # ### Grupo 3
 
@@ -162,7 +156,6 @@ print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 item_list = create_item_list(filters = filters)
 
-
 # In[16]:
 
 
@@ -170,7 +163,6 @@ data3 = get_df_list(item_list)
 data3["installment"] = "no_interest"
 data3["display_size"] = "hasta 14.1" 
 data3["shipping_cost"] = "free"
-
 
 # ### Grupo 4
 
@@ -194,7 +186,6 @@ print(f'Encontramos {maximum} resultados para nuestra consulta')
 
 item_list = create_item_list(filters = filters)
 
-
 # In[20]:
 
 
@@ -203,7 +194,6 @@ data4["installment"] = "no_interest"
 data4["display_size"] = "entre 14.1 y 16.9"
 data4["shipping_cost"] = "free"
 
-
 # ________________________
 
 # In[21]:
@@ -211,21 +201,34 @@ data4["shipping_cost"] = "free"
 
 data = pd.concat([data, data2, data3, data4])
 
-
-# In[22]:
+# In[ ]:
 
 
 data.shape
 
-
-# In[23]:
+# In[ ]:
 
 
 data.title.value_counts()
 
+# In[ ]:
 
-# In[24]:
+
+import datetime as dt
+
+anio = dt.datetime.now().year
+mes = dt.datetime.now().month
+dia = dt.datetime.now().day
+hora = dt.datetime.now().hour
+minuto = dt.datetime.now().minute
 
 
-data.to_csv(path_save / "datos_laptops.csv", index = False, sep = ";")
+# In[ ]:
 
+
+path_save /f"datos_laptops_{anio*10000+mes*100+dia}_{hora}.{minuto}.csv"
+
+# In[ ]:
+
+
+data.to_csv(path_save / f"datos_laptops_{anio*10000+mes*100+dia}_{hora}.{minuto}.csv", index = False, sep = ";")
